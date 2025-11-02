@@ -3,7 +3,7 @@ name: Deploy Iris API to GKE
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   deploy:
@@ -27,11 +27,11 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/iris-repo/iris-api:latest .
+        docker build -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/mlops-w6/mlops-w6-iris-api:latest .
 
     - name: Push Docker image to Artifact Registry
       run: |
-        docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/iris-repo/iris-api:latest
+        docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/mlops-w6/mlops-w6-iris-api:latest
 
     - name: Set up GKE credentials
       uses: google-github-actions/get-gke-credentials@v2
