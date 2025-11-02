@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: iris-api
-        image: us-central1-docker.pkg.dev/heroic-calculus-473902-b8/mlops-w6
+        image: us-central1-docker.pkg.dev/heroic-calculus-473902-b8/mlops-w6/mlops-w6-iris-api:latest
         ports:
         - containerPort: 8200
 ---
