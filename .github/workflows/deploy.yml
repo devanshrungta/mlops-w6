@@ -1,0 +1,47 @@
+name: Deploy Iris API to GKE
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up GCP credentials
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Configure Docker to use Artifact Registry
+      run: |
+        gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/iris-repo/iris-api:latest .
+
+    - name: Push Docker image to Artifact Registry
+      run: |
+        docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/iris-repo/iris-api:latest
+
+    - name: Set up GKE credentials
+      uses: google-github-actions/get-gke-credentials@v2
+      with:
+        cluster_name: ${{ secrets.GKE_CLUSTER }}
+        location: ${{ secrets.GCP_REGION }}
+
+    - name: Deploy to GKE
+      run: |
+        kubectl apply -f k8s-deployment.yaml
+        kubectl rollout status deployment/iris-api
+        kubectl get svc iris-api-service
+
